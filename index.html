@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>App Bolsa de Valores</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f4f6f8;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    .positive {
+      color: green;
+    }
+    .negative {
+      color: red;
+    }
+    #chart {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bolsa de Valores - Precio de Acciones</h1>
+
+  <table id="stocks-table">
+    <thead>
+      <tr>
+        <th>Acción</th>
+        <th>Precio (USD)</th>
+        <th>Cambio (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Se llenará con JS -->
+    </tbody>
+  </table>
+
+  <canvas id="chart" width="600" height="300"></canvas>
+
+  <script>
+    // Datos simulados de acciones
+    const stocks = [
+      { symbol: "AAPL", price: 145.32, change: 1.24 },
+      { symbol: "GOOGL", price: 2734.26, change: -0.85 },
+      { symbol: "AMZN", price: 3344.94, change: 0.32 },
+      { symbol: "MSFT", price: 299.79, change: -0.12 },
+      { symbol: "TSLA", price: 709.67, change: 2.1 },
+    ];
+
+    // Función para renderizar la tabla
+    function renderTable() {
+      const tbody = document.querySelector("#stocks-table tbody");
+      tbody.innerHTML = "";
+      stocks.forEach(stock => {
+        const tr = document.createElement("tr");
+
+        const tdSymbol = document.createElement("td");
+        tdSymbol.textContent = stock.symbol;
+
+        const tdPrice = document.createElement("td");
+        tdPrice.textContent = stock.price.toFixed(2);
+
+        const tdChange = document.createElement("td");
+        tdChange.textContent = (stock.change > 0 ? "+" : "") + stock.change.toFixed(2);
+        tdChange.className = stock.change >= 0 ? "positive" : "negative";
+
+        tr.appendChild(tdSymbol);
+        tr.appendChild(tdPrice);
+        tr.appendChild(tdChange);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Función para dibujar gráfico sencillo de líneas
+    function drawChart() {
+      const canvas = document.getElementById("chart");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Configuración
+      const padding = 40;
+      const width = canvas.width - padding * 2;
+      const height = canvas.height - padding * 2;
+
+      // Extraer precios para graficar
+      const prices = stocks.map(s => s.price);
+
+      // Escalar precios
+      const maxPrice = Math.max(...prices);
+      const minPrice = Math.min(...prices);
+
+      // Dibujar líneas
+      ctx.beginPath();
+      ctx.strokeStyle = "#007bff";
+      ctx.lineWidth = 2;
+
+      prices.forEach((price, i) => {
+        const x = padding + (i * (width / (prices.length - 1)));
+        const y = padding + height - ((price - minPrice) / (maxPrice - minPrice)) * height;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Dibujar puntos
+      prices.forEach((price, i) => {
+        const x = padding + (i * (width / (prices.length - 1)));
+        const y = padding + height - ((price - minPrice) / (maxPrice - minPrice)) * height;
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = "#007bff";
+        ctx.fill();
+      });
+
+      // Etiquetas en eje X
+      ctx.fillStyle = "#333";
+      ctx.font = "12px Arial";
+      stocks.forEach((stock, i) => {
+        const x = padding + (i * (width / (prices.length - 1)));
+        ctx.fillText(stock.symbol, x - 10, padding + height + 20);
+      });
+
+      // Etiquetas en eje Y (precios mínimo y máximo)
+      ctx.fillText(minPrice.toFixed(2), 5, padding + height);
+      ctx.fillText(maxPrice.toFixed(2), 5, padding);
+    }
+
+    // Inicializar
+    renderTable();
+    drawChart();
+  </script>
+</body>
+</html>
