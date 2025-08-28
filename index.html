@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>App Bolsa de Valores</title>
+   <!-- Vincular manifest -->
+  <link rel="manifest" href="manifest.json" />
+  
+  <!-- Icono -->
+  <link rel="icon" href="https://static.vecteezy.com/system/resources/previews/015/993/318/non_2x/stock-exchange-icon-design-free-vector.jpg" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -153,6 +158,16 @@
     // Inicializar
     renderTable();
     drawChart();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then((registration) => {
+          console.log('Service Worker registrado con éxito:', registration);
+        })
+        .catch((error) => {
+          console.error('Error al registrar el Service Worker:', error);
+        });
+    }
   </script>
 </body>
 </html>
